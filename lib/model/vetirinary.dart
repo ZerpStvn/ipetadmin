@@ -48,7 +48,7 @@ class VeterinaryModel {
 
   Map<String, dynamic> veterinarymap() {
     return {
-      'valid': 0,
+      'valid': 1,
       "tin": tin,
       "clinicname": clinicname,
       "dti": dti,

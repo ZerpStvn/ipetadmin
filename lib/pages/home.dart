@@ -118,6 +118,42 @@ class _HomeScreenVeterinaryState extends State<HomeScreenVeterinary> {
                         ),
                       ),
                       const SizedBox(
+                        height: 30,
+                      ),
+                      ListTile(
+                        onTap: () {
+                          setState(() {
+                            selectedIndex = 3;
+                          });
+                        },
+                        title: const Text(
+                          "Create Records",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        leading: const Icon(
+                          Icons.filter_center_focus_outlined,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      ListTile(
+                        onTap: () {
+                          setState(() {
+                            selectedIndex = 3;
+                          });
+                        },
+                        title: const Text(
+                          "Medical Records",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        leading: const Icon(
+                          Icons.archive_outlined,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(
                         height: 80,
                       ),
                       ListTile(

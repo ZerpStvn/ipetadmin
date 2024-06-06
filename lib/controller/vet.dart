@@ -46,7 +46,9 @@ class _VetControllerState extends State<VetController> {
         _pickedFile = selectedFile;
       });
     } else {
-      debugPrint("no Image Selected");
+      setState(() {
+        _pickedFile.isEmpty;
+      });
     }
   }
 
@@ -223,21 +225,25 @@ class _VetControllerState extends State<VetController> {
                         width: 100,
                         decoration: _pickedFile.isNotEmpty
                             ? BoxDecoration(
-                                color: Colors.grey,
+                                color: maincolor,
                                 shape: BoxShape.circle,
                                 image: DecorationImage(
                                     fit: BoxFit.cover,
                                     image: MemoryImage(_pickedFile)))
                             : BoxDecoration(
-                                color: Colors.grey,
+                                color: const Color.fromARGB(68, 158, 158, 158),
                                 shape: BoxShape.circle,
                                 border:
                                     Border.all(width: 3, color: Colors.green)),
+                        child: const Icon(
+                          Icons.add_a_photo,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                    Text(
-                      imageprofile ?? "",
-                      style: const TextStyle(
+                    const Text(
+                      "Please upload your profile",
+                      style: TextStyle(
                         color: Colors.red,
                       ),
                     ),
@@ -330,7 +336,16 @@ class _VetControllerState extends State<VetController> {
                     isuploading == false
                         ? GlobalButton(
                             callback: () {
-                              isuploading == false ? uploadfirstcred() : null;
+                              if (_pickedFile.isNotEmpty) {
+                                isuploading == false ? uploadfirstcred() : null;
+                              } else {
+                                setState(() {
+                                  imageprofile = "Please upload your profile";
+                                  debugPrint(imageprofile);
+                                  isuploading = false;
+                                });
+                              }
+
                               // Navigator.push(
                               //     context,
                               //     MaterialPageRoute(
