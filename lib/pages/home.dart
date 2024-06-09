@@ -2,10 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gopetadmin/misc/theme.dart';
 import 'package:gopetadmin/pages/Feedbacks.dart';
+import 'package:gopetadmin/pages/addrecord.dart';
 import 'package:gopetadmin/pages/appointment.dart';
 import 'package:gopetadmin/pages/calendar.dart';
 import 'package:gopetadmin/pages/login.dart';
 import 'package:gopetadmin/pages/profile.dart';
+import 'package:gopetadmin/pages/viewrecord.dart';
 
 class HomeScreenVeterinary extends StatefulWidget {
   const HomeScreenVeterinary({super.key});
@@ -28,6 +30,10 @@ class _HomeScreenVeterinaryState extends State<HomeScreenVeterinary> {
       return const VeterinaryProfile();
     } else if (selectedIndex == 3) {
       return const FeedbackReviews();
+    } else if (selectedIndex == 4) {
+      return const AddMedicalRecord();
+    } else if (selectedIndex == 5) {
+      return const ViewMedRecord();
     } else {
       return Container();
     }
@@ -123,7 +129,7 @@ class _HomeScreenVeterinaryState extends State<HomeScreenVeterinary> {
                       ListTile(
                         onTap: () {
                           setState(() {
-                            selectedIndex = 3;
+                            selectedIndex = 4;
                           });
                         },
                         title: const Text(
@@ -141,7 +147,7 @@ class _HomeScreenVeterinaryState extends State<HomeScreenVeterinary> {
                       ListTile(
                         onTap: () {
                           setState(() {
-                            selectedIndex = 3;
+                            selectedIndex = 5;
                           });
                         },
                         title: const Text(
