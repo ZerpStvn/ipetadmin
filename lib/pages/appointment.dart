@@ -103,100 +103,98 @@ class _AppointmentsState extends State<Appointments> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(11.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 30,
-            ),
-            const Text(
-              "List of Appointments",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            SizedBox(
-              width: 260,
-              height: 50,
-              child: TextFormField(
-                controller: search,
-                decoration: InputDecoration(
-                  suffixIcon: const Icon(Icons.search_outlined),
-                  hintText: "Search",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+    return Padding(
+      padding: const EdgeInsets.all(11.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          const SizedBox(
+            height: 0,
+          ),
+          const Text(
+            "List of Appointments",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(
+            height: 30,
+          ),
+          SizedBox(
+            width: 260,
+            height: 50,
+            child: TextFormField(
+              controller: search,
+              decoration: InputDecoration(
+                suffixIcon: const Icon(Icons.search_outlined),
+                hintText: "Search",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                onChanged: (value) {
-                  _filterData(value);
-                },
               ),
+              onChanged: (value) {
+                _filterData(value);
+              },
             ),
-            const SizedBox(
-              height: 30,
-            ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.80,
-              child: DataTable(
-                sortAscending: isAscending,
-                sortColumnIndex: 2,
-                columns: [
-                  const DataColumn(label: Text("ID")),
-                  const DataColumn(label: Text("Name")),
-                  DataColumn(
-                    label: const Text("Date"),
-                    onSort: (columnIndex, _) {
-                      _sortDataByDate();
-                    },
-                  ),
-                  const DataColumn(label: Text("Actions")),
-                ],
-                rows: _filteredData.map((data) {
-                  Timestamp timestamp =
-                      data['appoinmentdate'] ?? Timestamp.now();
-                  DateTime dateTime = timestamp.toDate();
-                  String formattedDate =
-                      DateFormat('MMMM dd, yyyy h:mm a').format(dateTime);
+          ),
+          const SizedBox(
+            height: 30,
+          ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.80,
+            child: DataTable(
+              sortAscending: isAscending,
+              sortColumnIndex: 2,
+              columns: [
+                const DataColumn(label: Text("ID")),
+                const DataColumn(label: Text("Name")),
+                DataColumn(
+                  label: const Text("Date"),
+                  onSort: (columnIndex, _) {
+                    _sortDataByDate();
+                  },
+                ),
+                const DataColumn(label: Text("Actions")),
+              ],
+              rows: _filteredData.map((data) {
+                Timestamp timestamp = data['appoinmentdate'] ?? Timestamp.now();
+                DateTime dateTime = timestamp.toDate();
+                String formattedDate =
+                    DateFormat('MMMM dd, yyyy h:mm a').format(dateTime);
 
-                  return DataRow(cells: [
-                    DataCell(
-                      Text(
-                        data['userid'] != null
-                            ? (data['userid'].length > 7
-                                ? data['userid'].substring(0, 7)
-                                : data['userid'])
-                            : '',
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                return DataRow(cells: [
+                  DataCell(
+                    Text(
+                      data['userid'] != null
+                          ? (data['userid'].length > 7
+                              ? data['userid'].substring(0, 7)
+                              : data['userid'])
+                          : '',
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    DataCell(Text(data['name'] ?? '')),
-                    DataCell(Text(formattedDate)),
-                    DataCell(IconButton(
-                      onPressed: () {
-                        setState(() {
-                          name = data['name'];
-                          appoinmentdate = data['appoinmentdate'];
-                          clinic = data['clinic'];
-                          urlprof = data['profile'];
-                          purpose = data['purpose'];
-                          service = data['service'];
-                          isview = !isview;
-                        });
+                  ),
+                  DataCell(Text(data['name'] ?? '')),
+                  DataCell(Text(formattedDate)),
+                  DataCell(IconButton(
+                    onPressed: () {
+                      setState(() {
+                        name = data['name'];
+                        appoinmentdate = data['appoinmentdate'];
+                        clinic = data['clinic'];
+                        urlprof = data['profile'];
+                        purpose = data['purpose'];
+                        service = data['service'];
+                        isview = !isview;
+                      });
 
-                        showModalinfo();
-                      },
-                      icon: const Icon(Icons.visibility_outlined),
-                    )),
-                  ]);
-                }).toList(),
-              ),
+                      showModalinfo();
+                    },
+                    icon: const Icon(Icons.visibility_outlined),
+                  )),
+                ]);
+              }).toList(),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
