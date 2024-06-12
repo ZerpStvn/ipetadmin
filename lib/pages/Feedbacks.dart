@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gopetadmin/misc/theme.dart';
@@ -23,7 +25,7 @@ class _FeedbackReviewsState extends State<FeedbackReviews> {
             const SizedBox(
               height: 30,
             ),
-            MainFont(
+            const MainFont(
               title: "Feedbacks",
               fsize: 23,
             ),

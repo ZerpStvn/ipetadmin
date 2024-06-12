@@ -4,7 +4,6 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/services.dart';
 import 'package:gopetadmin/controller/hooks.dart';
 import 'package:gopetadmin/controller/vetcred.dart';
-import 'package:gopetadmin/controller/vetmap.dart';
 import 'package:gopetadmin/misc/randomstring.dart';
 import 'package:gopetadmin/misc/snackbar.dart';
 import 'package:gopetadmin/model/users.dart';

@@ -3,7 +3,6 @@ import 'package:gopetadmin/controller/hooks.dart';
 import 'package:gopetadmin/misc/randomstring.dart';
 import 'package:gopetadmin/misc/theme.dart';
 import 'package:gopetadmin/model/authprovider.dart';
-import 'package:gopetadmin/widgets/ratingreview.dart';
 import 'package:provider/provider.dart';
 
 class VeterinaryProfile extends StatefulWidget {
