@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gopetadmin/pages/addrecord.dart';
 import 'package:gopetadmin/pages/recordsview.dart';
 
 class ViewMedRecord extends StatefulWidget {
@@ -104,7 +103,11 @@ class _ViewMedRecordState extends State<ViewMedRecord> {
             content: Text(content),
             actions: [
               TextButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    Navigator.pop(context);
+
+                    setState(() {});
+                  },
                   child: const Text("Continue"))
             ],
           );

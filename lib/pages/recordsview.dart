@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gopetadmin/misc/theme.dart';
-import 'package:gopetadmin/model/authprovider.dart';
-import 'package:provider/provider.dart';
+// import 'package:gopetadmin/model/authprovider.dart';
+// import 'package:provider/provider.dart';
 
 class RecordsView extends StatefulWidget {
   final String? recordID;
@@ -159,7 +159,7 @@ class _RecordsViewState extends State<RecordsView> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<AuthProviderClass>(context);
+    //final provider = Provider.of<AuthProviderClass>(context);
     return Scaffold(
       appBar: AppBar(),
       body: SingleChildScrollView(
