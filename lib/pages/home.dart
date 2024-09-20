@@ -31,7 +31,10 @@ class _HomeScreenVeterinaryState extends State<HomeScreenVeterinary> {
     } else if (selectedIndex == 3) {
       return const FeedbackReviews();
     } else if (selectedIndex == 4) {
-      return const AddMedicalRecord();
+      return const AddMedicalRecord(
+        isedit: false,
+        isview: false,
+      );
     } else if (selectedIndex == 5) {
       return const ViewMedRecord();
     } else {
@@ -180,10 +183,21 @@ class _HomeScreenVeterinaryState extends State<HomeScreenVeterinary> {
                 ),
               )),
           Expanded(
-              flex: 5,
-              child: Column(
-                children: [navigator()],
-              ))
+            flex: 5,
+            child: selectedIndex == 4
+                ? SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [navigator()],
+                    ),
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [navigator()],
+                  ),
+          )
         ],
       ),
     );
