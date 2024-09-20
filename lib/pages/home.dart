@@ -5,9 +5,11 @@ import 'package:gopetadmin/pages/Feedbacks.dart';
 import 'package:gopetadmin/pages/addrecord.dart';
 import 'package:gopetadmin/pages/appointment.dart';
 import 'package:gopetadmin/pages/calendar.dart';
+import 'package:gopetadmin/pages/chat.dart';
 import 'package:gopetadmin/pages/login.dart';
 import 'package:gopetadmin/pages/profile.dart';
 import 'package:gopetadmin/pages/viewrecord.dart';
+import 'package:http/http.dart';
 
 class HomeScreenVeterinary extends StatefulWidget {
   const HomeScreenVeterinary({super.key});
@@ -37,6 +39,8 @@ class _HomeScreenVeterinaryState extends State<HomeScreenVeterinary> {
       );
     } else if (selectedIndex == 5) {
       return const ViewMedRecord();
+    } else if (selectedIndex == 6) {
+      return const ChatPage();
     } else {
       return Container();
     }
@@ -100,11 +104,11 @@ class _HomeScreenVeterinaryState extends State<HomeScreenVeterinary> {
                           });
                         },
                         title: const Text(
-                          "Profile",
+                          "Document ID",
                           style: TextStyle(color: Colors.white),
                         ),
                         leading: const Icon(
-                          Icons.person_outline,
+                          Icons.square,
                           color: Colors.white,
                         ),
                       ),
@@ -160,6 +164,38 @@ class _HomeScreenVeterinaryState extends State<HomeScreenVeterinary> {
                         leading: const Icon(
                           Icons.archive_outlined,
                           color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      ListTile(
+                        onTap: () {
+                          setState(() {
+                            selectedIndex = 6;
+                          });
+                        },
+                        title: const Text(
+                          "Message",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        leading: Stack(
+                          children: [
+                            const Icon(
+                              Icons.message_outlined,
+                              color: Colors.white,
+                            ),
+                            Positioned(
+                                top: 0,
+                                right: 0,
+                                child: Container(
+                                  height: 10,
+                                  width: 10,
+                                  decoration: const BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle),
+                                )),
+                          ],
                         ),
                       ),
                       const SizedBox(

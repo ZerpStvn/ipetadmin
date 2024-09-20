@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gopetadmin/controller/hooks.dart';
 import 'package:gopetadmin/misc/randomstring.dart';
@@ -13,220 +15,157 @@ class VeterinaryProfile extends StatefulWidget {
 }
 
 class _VeterinaryProfileState extends State<VeterinaryProfile> {
+  final FirebaseAuth userauth = FirebaseAuth.instance;
+  final FirebaseFirestore usercred = FirebaseFirestore.instance;
+
+  TextEditingController _tinController = TextEditingController();
+  TextEditingController _birController = TextEditingController();
+  TextEditingController _dtiController = TextEditingController();
+
+  bool isEditing = false;
+
+  // Function to update data in Firestore
+  Future<void> _updateServices(String tin, String bir, String dti) async {
+    await usercred
+        .doc(userauth.currentUser!.uid)
+        .collection('vertirenary')
+        .doc(userauth.currentUser!.uid)
+        .update({
+      'tin': tin,
+      'bir': bir,
+      'dti': dti,
+    });
+    setState(() {
+      isEditing = false; // Exit edit mode after updating
+    });
+  }
+
+  // Function to toggle between view and edit mode
+  void _toggleEdit(Map<String, dynamic> services) {
+    setState(() {
+      isEditing = true;
+      _tinController.text = services['tin'];
+      _birController.text = services['bir'];
+      _dtiController.text = services['dti'];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<AuthProviderClass>(context);
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(18.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+    return FutureBuilder<DocumentSnapshot>(
+      future: usercred
+          .doc(userauth.currentUser!.uid)
+          .collection('vertirenary')
+          .doc(userauth.currentUser!.uid)
+          .get(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasData) {
+          Map<String, dynamic>? services;
+          if (snapshot.data!.exists) {
+            services = snapshot.data!.data() as Map<String, dynamic>;
+          }
+
+          if (isEditing) {
+            // Editing UI
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  height: 100,
-                  width: 100,
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                          image: NetworkImage(
-                              "${provider.userModel!.imageprofile}"),
-                          fit: BoxFit.cover)),
+                TextField(
+                  controller: _tinController,
+                  decoration: InputDecoration(labelText: 'TIN ID'),
                 ),
-                const SizedBox(
-                  width: 30,
+                const SizedBox(height: 18),
+                TextField(
+                  controller: _birController,
+                  decoration: InputDecoration(labelText: 'BIR Certificate URL'),
                 ),
-                SizedBox(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      MainFont(
-                        title: splitWords("${provider.userModel!.nameclinic}"),
-                        fsize: 21,
-                      ),
-                      const Row(
-                        children: [
-                          Icon(Icons.domain_outlined),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          MainFont(title: "Veterinary Clinic")
-                        ],
-                      ),
-                      provider.veterinarymovel!.valid == 1
-                          ? const Row(
-                              children: [
-                                Icon(
-                                  Icons.check_rounded,
-                                  color: Colors.green,
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                MainFont(
-                                  title: "Verified",
-                                  color: Colors.green,
-                                )
-                              ],
-                            )
-                          : const Row(
-                              children: [
-                                Icon(
-                                  Icons.pending,
-                                  color: Colors.red,
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                MainFont(
-                                  title: "Reviewing",
-                                  color: Colors.red,
-                                )
-                              ],
-                            )
-                    ],
-                  ),
-                )
+                const SizedBox(height: 18),
+                TextField(
+                  controller: _dtiController,
+                  decoration: InputDecoration(labelText: 'DTI Certificate URL'),
+                ),
+                const SizedBox(height: 18),
+                ElevatedButton(
+                  onPressed: () {
+                    _updateServices(
+                      _tinController.text,
+                      _birController.text,
+                      _dtiController.text,
+                    );
+                  },
+                  child: const Text('Save'),
+                ),
+                const SizedBox(height: 18),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      isEditing = false;
+                    });
+                  },
+                  child: const Text('Cancel'),
+                ),
               ],
-            ),
-            // services
-            const SizedBox(
-              height: 20,
-            ),
-            FutureBuilder<double>(
-              future: calculateRating("${provider.userModel!.vetid}"),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Container();
-                } else if (snapshot.hasError || !snapshot.hasData) {
-                  return MainFont(
-                    title: "No Reviews",
-                    color: maincolor,
-                  );
-                } else {
-                  return MainFont(
-                    title:
-                        "Reviews ${double.parse("${snapshot.data}").toStringAsFixed(1)}",
-                    color: maincolor,
-                  );
-                }
-              },
-            ),
-
-            Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: MainFont(
-                title: "Phone number: ${provider.userModel!.pnum}",
-                fsize: 15,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: MainFont(
-                title: "Email: ${provider.userModel!.email}",
-                fsize: 15,
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.only(top: 20.0),
-              child: MainFont(
-                title: "About us",
-                fsize: 20,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: Text(
-                "${provider.veterinarymovel!.description}",
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.only(top: 40.0),
-              child: MainFont(
-                title: "Services",
-                fsize: 20,
-              ),
-            ),
-            FutureBuilder(
-              future: usercred
-                  .doc("${provider.userModel!.vetid}")
-                  .collection('vertirenary')
-                  .doc("${provider.userModel!.vetid}")
-                  .get(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Container();
-                } else if (snapshot.hasData) {
-                  List<String> services = [];
-                  if (snapshot.data!.exists) {
-                    services = List<String>.from(
-                        snapshot.data!.data()!['services'] ?? []);
-                  }
-                  return Wrap(
-                    spacing: 8.0,
-                    runSpacing: 8.0,
-                    children: services.map((e) {
-                      return Chip(
-                        side: BorderSide(width: 1, color: maincolor),
-                        label: Text(e),
-                        backgroundColor: maincolor,
-                        labelStyle: const TextStyle(color: Colors.white),
-                      );
-                    }).toList(),
-                  );
-                }
-                return Container();
-              },
-            ),
-
-            const Padding(
-              padding: EdgeInsets.only(top: 25.0),
-              child: MainFont(
-                title: "Specialties",
-                fsize: 20,
-              ),
-            ),
-            FutureBuilder(
-              future: usercred
-                  .doc("${provider.userModel!.vetid}")
-                  .collection('vertirenary')
-                  .doc("${provider.userModel!.vetid}")
-                  .get(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Container();
-                } else if (snapshot.hasData) {
-                  List<String> services = [];
-                  if (snapshot.data!.exists) {
-                    services = List<String>.from(
-                        snapshot.data!.data()!['specialties'] ?? []);
-                  }
-                  return Wrap(
-                    spacing: 8.0,
-                    runSpacing: 8.0,
-                    children: services.map((e) {
-                      return Chip(
-                        label: Text(e),
-                        backgroundColor: maincolor,
-                        labelStyle: const TextStyle(color: Colors.white),
-                      );
-                    }).toList(),
-                  );
-                }
-                return Container();
-              },
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-          ],
-        ),
-      ),
+            );
+          } else {
+            // Viewing UI
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("Government ID"),
+                const SizedBox(height: 18),
+                ListTile(
+                  leading: const Icon(Icons.perm_identity),
+                  subtitle: Text(
+                    "${services!['tin']}",
+                    style: TextStyle(color: Colors.blue, fontSize: 16),
+                  ),
+                  title: const Text("TIN ID:"),
+                ),
+                const SizedBox(height: 18),
+                Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("BIR CERTIFICATE"),
+                        SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: Image.network(
+                              fit: BoxFit.cover, "${services['bir']}"),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 18),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("DTI CERTIFICATE"),
+                        SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: Image.network(
+                              fit: BoxFit.cover, "${services['dti']}"),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                ElevatedButton(
+                  onPressed: () {
+                    _toggleEdit(services!);
+                  },
+                  child: const Text('Edit'),
+                ),
+              ],
+            );
+          }
+        }
+        return Container();
+      },
     );
   }
 }

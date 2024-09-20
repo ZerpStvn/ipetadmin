@@ -97,7 +97,7 @@ class _VetControllerState extends State<VetController> {
       usersModel.pnum = phonenumber.text;
       usersModel.email = emailaddress.text;
       usersModel.pass = password.text;
-      usersModel.role = 1;
+      usersModel.role = 0;
       usersModel.vetid = userAuth.currentUser!.uid;
 
       await usercred
