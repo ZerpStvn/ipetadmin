@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gopetadmin/controller/hooks.dart';
-import 'package:gopetadmin/misc/randomstring.dart';
 import 'package:gopetadmin/misc/theme.dart';
-import 'package:gopetadmin/model/authprovider.dart';
-import 'package:provider/provider.dart';
+// import 'package:gopetadmin/controller/hooks.dart';
+// import 'package:gopetadmin/misc/randomstring.dart';
+// import 'package:gopetadmin/misc/theme.dart';
+// import 'package:gopetadmin/model/authprovider.dart';
+// import 'package:provider/provider.dart';
 
 class VeterinaryProfile extends StatefulWidget {
   const VeterinaryProfile({super.key});
@@ -18,154 +19,195 @@ class _VeterinaryProfileState extends State<VeterinaryProfile> {
   final FirebaseAuth userauth = FirebaseAuth.instance;
   final FirebaseFirestore usercred = FirebaseFirestore.instance;
 
-  TextEditingController _tinController = TextEditingController();
-  TextEditingController _birController = TextEditingController();
-  TextEditingController _dtiController = TextEditingController();
-
-  bool isEditing = false;
-
-  // Function to update data in Firestore
-  Future<void> _updateServices(String tin, String bir, String dti) async {
-    await usercred
-        .doc(userauth.currentUser!.uid)
-        .collection('vertirenary')
-        .doc(userauth.currentUser!.uid)
-        .update({
-      'tin': tin,
-      'bir': bir,
-      'dti': dti,
-    });
-    setState(() {
-      isEditing = false; // Exit edit mode after updating
-    });
-  }
-
-  // Function to toggle between view and edit mode
-  void _toggleEdit(Map<String, dynamic> services) {
-    setState(() {
-      isEditing = true;
-      _tinController.text = services['tin'];
-      _birController.text = services['bir'];
-      _dtiController.text = services['dti'];
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<DocumentSnapshot>(
-      future: usercred
-          .doc(userauth.currentUser!.uid)
-          .collection('vertirenary')
-          .doc(userauth.currentUser!.uid)
-          .get(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
-        } else if (snapshot.hasData) {
-          Map<String, dynamic>? services;
-          if (snapshot.data!.exists) {
-            services = snapshot.data!.data() as Map<String, dynamic>;
-          }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        FutureBuilder(
+            future: usercred
+                .collection('users')
+                .doc(userauth.currentUser!.uid)
+                .get(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return Container();
+              } else {
+                Map<String, dynamic>? snaphotdata = snapshot.data!.data();
+                return Container(
+                  height: 230,
+                  width: MediaQuery.of(context).size.width,
+                  color: maincolor,
+                  child: Padding(
+                    padding: const EdgeInsets.all(18.0),
+                    child: Row(
+                      children: [
+                        Container(
+                          height: 170,
+                          width: 170,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: maincolor,
+                              image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(
+                                      snaphotdata!['imageprofile']))),
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        FutureBuilder(
+                            future: usercred
+                                .collection('users')
+                                .doc(userauth.currentUser!.uid)
+                                .collection('vertirenary')
+                                .doc(userauth.currentUser!.uid)
+                                .get(),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return Container();
+                              } else {
+                                Map<String, dynamic>? snaphotdata =
+                                    snapshot.data!.data();
 
-          if (isEditing) {
-            // Editing UI
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: _tinController,
-                  decoration: InputDecoration(labelText: 'TIN ID'),
-                ),
-                const SizedBox(height: 18),
-                TextField(
-                  controller: _birController,
-                  decoration: InputDecoration(labelText: 'BIR Certificate URL'),
-                ),
-                const SizedBox(height: 18),
-                TextField(
-                  controller: _dtiController,
-                  decoration: InputDecoration(labelText: 'DTI Certificate URL'),
-                ),
-                const SizedBox(height: 18),
-                ElevatedButton(
-                  onPressed: () {
-                    _updateServices(
-                      _tinController.text,
-                      _birController.text,
-                      _dtiController.text,
-                    );
-                  },
-                  child: const Text('Save'),
-                ),
-                const SizedBox(height: 18),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      isEditing = false;
-                    });
-                  },
-                  child: const Text('Cancel'),
-                ),
-              ],
-            );
-          } else {
-            // Viewing UI
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text("Government ID"),
-                const SizedBox(height: 18),
-                ListTile(
-                  leading: const Icon(Icons.perm_identity),
-                  subtitle: Text(
-                    "${services!['tin']}",
-                    style: TextStyle(color: Colors.blue, fontSize: 16),
+                                return Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "${snaphotdata!['clinicname']}",
+                                      style: const TextStyle(
+                                          fontSize: 32, color: Colors.white),
+                                    ),
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.health_and_safety_outlined,
+                                          color: Colors.white,
+                                        ),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text(
+                                          "${snaphotdata['description']}",
+                                          style: const TextStyle(
+                                              fontSize: 23,
+                                              color: Colors.white),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                );
+                              }
+                            })
+                      ],
+                    ),
                   ),
-                  title: const Text("TIN ID:"),
-                ),
-                const SizedBox(height: 18),
-                Row(
-                  children: [
-                    Column(
+                );
+              }
+            }),
+        const SizedBox(
+          height: 30,
+        ),
+        Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: FutureBuilder(
+              future: usercred
+                  .collection('users')
+                  .doc(userauth.currentUser!.uid)
+                  .collection('vertirenary')
+                  .doc(userauth.currentUser!.uid)
+                  .get(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Container();
+                } else {
+                  Map<String, dynamic>? snaphotdata = snapshot.data!.data();
+
+                  return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("BIR CERTIFICATE"),
-                        SizedBox(
-                          width: 200,
-                          height: 200,
-                          child: Image.network(
-                              fit: BoxFit.cover, "${services['bir']}"),
+                        const Text(
+                          "Taxpayer Identification Number",
+                          style: TextStyle(fontSize: 21, color: Colors.black),
                         ),
-                      ],
-                    ),
-                    const SizedBox(width: 18),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text("DTI CERTIFICATE"),
-                        SizedBox(
-                          width: 200,
-                          height: 200,
-                          child: Image.network(
-                              fit: BoxFit.cover, "${services['dti']}"),
+                        Text(
+                          "${snaphotdata!['tin']}",
+                          style: TextStyle(fontSize: 28, color: maincolor),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 18),
-                ElevatedButton(
-                  onPressed: () {
-                    _toggleEdit(services!);
-                  },
-                  child: const Text('Edit'),
-                ),
-              ],
-            );
-          }
-        }
-        return Container();
-      },
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          children: [
+                            Column(
+                              children: [
+                                const Text(
+                                  "BIR Certificate",
+                                  style: TextStyle(
+                                      fontSize: 21, color: Colors.black),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  height: 270,
+                                  width: 270,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                          width: 1, color: Colors.black),
+                                      image: DecorationImage(
+                                          fit: BoxFit.cover,
+                                          image: NetworkImage(
+                                              snaphotdata['bir']))),
+                                ),
+                                const SizedBox(
+                                  width: 20,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              width: 15,
+                            ),
+                            Column(
+                              children: [
+                                const Text(
+                                  "DTI Certificate",
+                                  style: TextStyle(
+                                      fontSize: 21, color: Colors.black),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  height: 270,
+                                  width: 270,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                          width: 1, color: Colors.black),
+                                      image: DecorationImage(
+                                          fit: BoxFit.cover,
+                                          image: NetworkImage(
+                                              snaphotdata['dti']))),
+                                ),
+                                const SizedBox(
+                                  width: 20,
+                                ),
+                              ],
+                            )
+                          ],
+                        )
+                      ]);
+                }
+              }),
+        )
+      ],
     );
   }
 }

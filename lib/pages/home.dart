@@ -9,7 +9,6 @@ import 'package:gopetadmin/pages/chat.dart';
 import 'package:gopetadmin/pages/login.dart';
 import 'package:gopetadmin/pages/profile.dart';
 import 'package:gopetadmin/pages/viewrecord.dart';
-import 'package:http/http.dart';
 
 class HomeScreenVeterinary extends StatefulWidget {
   const HomeScreenVeterinary({super.key});
@@ -54,6 +53,7 @@ class _HomeScreenVeterinaryState extends State<HomeScreenVeterinary> {
           Expanded(
               flex: 1,
               child: Drawer(
+                shape: RoundedRectangleBorder(),
                 backgroundColor: maincolor,
                 child: SingleChildScrollView(
                   child: Column(
@@ -104,7 +104,7 @@ class _HomeScreenVeterinaryState extends State<HomeScreenVeterinary> {
                           });
                         },
                         title: const Text(
-                          "Document ID",
+                          "Profile",
                           style: TextStyle(color: Colors.white),
                         ),
                         leading: const Icon(
