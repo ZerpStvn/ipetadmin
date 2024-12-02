@@ -2,6 +2,7 @@ class UsersModel {
   String? vetid;
   String? imageprofile;
   int? role;
+  int? isverified;
   String? nameclinic;
   String? fname;
   String? lname;
@@ -13,6 +14,7 @@ class UsersModel {
     this.vetid,
     this.imageprofile,
     this.role,
+    this.isverified,
     this.nameclinic,
     this.fname,
     this.lname,
@@ -26,6 +28,7 @@ class UsersModel {
       vetid: map['vetid'],
       imageprofile: map['imageprofile'],
       role: map['role'],
+      isverified: map['isverified'],
       nameclinic: map['nameclinic'],
       fname: map['fname'],
       lname: map['lname'],
@@ -40,6 +43,7 @@ class UsersModel {
       vetid: map['vetid'],
       imageprofile: map['imageprofile'],
       role: map['role'],
+      isverified: map['isverified'],
       nameclinic: map['nameclinic'],
       fname: map['fname'],
       lname: map['lname'],
@@ -53,6 +57,7 @@ class UsersModel {
       'vetid': vetid,
       "imageprofile": imageprofile,
       "role": role,
+      "isverified": isverified,
       "nameclinic": nameclinic,
       "fname": fname,
       "lname": lname,

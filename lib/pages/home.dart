@@ -8,6 +8,7 @@ import 'package:gopetadmin/pages/calendar.dart';
 import 'package:gopetadmin/pages/chat.dart';
 import 'package:gopetadmin/pages/login.dart';
 import 'package:gopetadmin/pages/profile.dart';
+import 'package:gopetadmin/pages/uploadrecord.dart';
 import 'package:gopetadmin/pages/viewrecord.dart';
 
 class HomeScreenVeterinary extends StatefulWidget {
@@ -18,7 +19,7 @@ class HomeScreenVeterinary extends StatefulWidget {
 }
 
 class _HomeScreenVeterinaryState extends State<HomeScreenVeterinary> {
-  int selectedIndex = 0;
+  int selectedIndex = 7;
 
   Widget navigator() {
     if (selectedIndex == 0) {
@@ -40,6 +41,8 @@ class _HomeScreenVeterinaryState extends State<HomeScreenVeterinary> {
       return const ViewMedRecord();
     } else if (selectedIndex == 6) {
       return const ChatPage();
+    } else if (selectedIndex == 7) {
+      return const Uploadrecords();
     } else {
       return Container();
     }
@@ -163,6 +166,24 @@ class _HomeScreenVeterinaryState extends State<HomeScreenVeterinary> {
                         ),
                         leading: const Icon(
                           Icons.archive_outlined,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      ListTile(
+                        onTap: () {
+                          setState(() {
+                            selectedIndex = 7;
+                          });
+                        },
+                        title: const Text(
+                          "Upload Records",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        leading: const Icon(
+                          Icons.upload_file_outlined,
                           color: Colors.white,
                         ),
                       ),

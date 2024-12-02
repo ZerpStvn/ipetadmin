@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gopetadmin/misc/theme.dart';
 import 'package:gopetadmin/model/authprovider.dart';
@@ -16,6 +17,7 @@ class AddMedicalRecord extends StatefulWidget {
 }
 
 class _AddMedicalRecordState extends State<AddMedicalRecord> {
+  final currentuser = FirebaseAuth.instance.currentUser?.uid;
   // Define a global key for the form
   final _formKey = GlobalKey<FormState>();
 
@@ -99,32 +101,46 @@ class _AddMedicalRecordState extends State<AddMedicalRecord> {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 30),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Owner Information
             const Text('Owner Information',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            TextFormField(
-              controller: ownerNameController,
-              decoration:
-                  const InputDecoration(labelText: 'Owner\'s Full Name'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter the owner\'s full name';
-                }
-                return null;
-              },
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: ownerNameController,
+                    decoration: const InputDecoration(
+                        labelText: 'Owner\'s Full Name',
+                        border: OutlineInputBorder()),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the owner\'s full name';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                  child: TextFormField(
+                    controller: ownerAddressController,
+                    decoration: const InputDecoration(
+                        labelText: 'Address', border: OutlineInputBorder()),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the address';
+                      }
+                      return null;
+                    },
+                  ),
+                )
+              ],
             ),
 
-            TextFormField(
-              controller: ownerAddressController,
-              decoration: const InputDecoration(labelText: 'Address'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter the address';
-                }
-                return null;
-              },
-            ),
             TextFormField(
               controller: ownerPhoneController,
               decoration: const InputDecoration(labelText: 'Phone Number'),
@@ -152,31 +168,45 @@ class _AddMedicalRecordState extends State<AddMedicalRecord> {
               },
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 40),
 
             // Pet Information
             const Text('Pet Information',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            TextFormField(
-              controller: petNameController,
-              decoration: const InputDecoration(labelText: 'Pet\'s Name'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter the pet\'s name';
-                }
-                return null;
-              },
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: petNameController,
+                    decoration: const InputDecoration(
+                        labelText: 'Pet\'s Name', border: OutlineInputBorder()),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the pet\'s name';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                Expanded(
+                  child: TextFormField(
+                    controller: petSpeciesController,
+                    decoration: const InputDecoration(
+                        labelText: 'Species', border: OutlineInputBorder()),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the species';
+                      }
+                      return null;
+                    },
+                  ),
+                )
+              ],
             ),
-            TextFormField(
-              controller: petSpeciesController,
-              decoration: const InputDecoration(labelText: 'Species'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter the species';
-                }
-                return null;
-              },
-            ),
+
             TextFormField(
               controller: petBreedController,
               decoration: const InputDecoration(labelText: 'Breed'),
@@ -227,21 +257,35 @@ class _AddMedicalRecordState extends State<AddMedicalRecord> {
                   const InputDecoration(labelText: 'Spayed/Neutered Status'),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 40),
 
             // Medical History
             const Text('Medical History',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            TextFormField(
-              controller: previousClinicsController,
-              decoration: const InputDecoration(
-                  labelText: 'Previous Veterinary Clinics'),
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: previousClinicsController,
+                    decoration: const InputDecoration(
+                        labelText: 'Previous Veterinary Clinics',
+                        border: OutlineInputBorder()),
+                  ),
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                Expanded(
+                  child: TextFormField(
+                    controller: previousConditionsController,
+                    decoration: const InputDecoration(
+                        labelText: 'Previous Medical Conditions',
+                        border: OutlineInputBorder()),
+                  ),
+                )
+              ],
             ),
-            TextFormField(
-              controller: previousConditionsController,
-              decoration: const InputDecoration(
-                  labelText: 'Previous Medical Conditions'),
-            ),
+
             TextFormField(
               controller: currentConditionsController,
               decoration: const InputDecoration(
@@ -276,7 +320,7 @@ class _AddMedicalRecordState extends State<AddMedicalRecord> {
               decoration: const InputDecoration(labelText: 'Chronic Diseases'),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 40),
 
             // Current Visit Information
             const Text('Current Visit Information',
@@ -347,7 +391,7 @@ class _AddMedicalRecordState extends State<AddMedicalRecord> {
                         borderRadius: BorderRadius.circular(8))),
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    _addRecordToFirestore("${provider.userModel!.vetid}");
+                    _addRecordToFirestore("$currentuser");
                   }
                 },
                 child: const Text(

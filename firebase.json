@@ -1,6 +1,7 @@
 {
   "hosting": {
     "public": "build/web",
+    " site": "petgoveterinary",
     "ignore": [
       "firebase.json",
       "**/.*",

@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:gopetadmin/misc/theme.dart';
 import 'package:gopetadmin/model/authprovider.dart';
 import 'package:provider/provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 class RecordsView extends StatefulWidget {
   final String? recordID;
@@ -458,27 +461,52 @@ class _RecordsViewState extends State<RecordsView> {
                     const SizedBox(height: 20),
                     //Text("${provider.userModel!.vetid}"),
                     // Submit Button
-                    widget.isview == false
-                        ? SizedBox(
-                            width: 230,
-                            height: 50,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: maincolor,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8))),
-                              onPressed: () {
-                                if (_formKey.currentState!.validate()) {
-                                  _updateRecordToFirestore();
-                                }
-                              },
-                              child: const Text(
-                                'Submit',
-                                style: TextStyle(color: Colors.white),
-                              ),
+                    Row(
+                      children: [
+                        widget.isview == false
+                            ? SizedBox(
+                                width: 230,
+                                height: 50,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: maincolor,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8))),
+                                  onPressed: () {
+                                    if (_formKey.currentState!.validate()) {
+                                      _updateRecordToFirestore();
+                                    }
+                                  },
+                                  child: const Text(
+                                    'Submit',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              )
+                            : Container(),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        SizedBox(
+                          width: 230,
+                          height: 50,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: maincolor,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8))),
+                            onPressed: () {
+                              generateAndPrintPDF();
+                            },
+                            child: const Text(
+                              'Print Document',
+                              style: TextStyle(color: Colors.white),
                             ),
-                          )
-                        : Container(),
+                          ),
+                        )
+                      ],
+                    )
                   ],
                 ),
               ),
@@ -553,5 +581,127 @@ class _RecordsViewState extends State<RecordsView> {
             ],
           );
         });
+  }
+
+  void generateAndPrintPDF() async {
+    final pdf = pw.Document();
+
+    // Define styles for headings and text
+    final headerStyle = pw.TextStyle(
+        fontSize: 20, fontWeight: pw.FontWeight.bold, color: PdfColors.blue);
+    final subHeaderStyle = pw.TextStyle(
+        fontSize: 16, fontWeight: pw.FontWeight.bold, color: PdfColors.black);
+    final normalTextStyle = pw.TextStyle(fontSize: 12);
+
+    // Add a styled page
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Container(
+            padding: const pw.EdgeInsets.all(20),
+            decoration: pw.BoxDecoration(
+              border: pw.Border.all(color: PdfColors.grey),
+            ),
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                // Header
+                pw.Center(
+                  child: pw.Text(
+                    "Medical Information",
+                    style: headerStyle,
+                  ),
+                ),
+                pw.SizedBox(height: 20),
+
+                // Section: Owner Information
+                pw.Text(" Owner Information ", style: subHeaderStyle),
+                pw.Divider(color: PdfColors.grey),
+                pw.Text(
+                    "Name: ${ownerNameController.text.isNotEmpty ? ownerNameController.text : 'Not provided'}",
+                    style: normalTextStyle),
+                pw.Text(
+                    "Address: ${ownerAddressController.text.isNotEmpty ? ownerAddressController.text : 'Not provided'}",
+                    style: normalTextStyle),
+                pw.Text(
+                    "Phone: ${ownerPhoneController.text.isNotEmpty ? ownerPhoneController.text : 'Not provided'}",
+                    style: normalTextStyle),
+                pw.Text(
+                    "Email: ${ownerEmailController.text.isNotEmpty ? ownerEmailController.text : 'Not provided'}",
+                    style: normalTextStyle),
+
+                pw.SizedBox(height: 10),
+
+                // Section: Pet Information
+                pw.Text(" Pet Information ", style: subHeaderStyle),
+                pw.Divider(color: PdfColors.grey),
+                pw.Text(
+                    "Name: ${petNameController.text.isNotEmpty ? petNameController.text : 'Not provided'}",
+                    style: normalTextStyle),
+                pw.Text(
+                    "Species: ${petSpeciesController.text.isNotEmpty ? petSpeciesController.text : 'Not provided'}",
+                    style: normalTextStyle),
+                pw.Text(
+                    "Breed: ${petBreedController.text.isNotEmpty ? petBreedController.text : 'Not provided'}",
+                    style: normalTextStyle),
+                pw.Text(
+                    "Gender: ${petGenderController.text.isNotEmpty ? petGenderController.text : 'Not provided'}",
+                    style: normalTextStyle),
+                pw.Text(
+                    "Date of Birth: ${petDobController.text.isNotEmpty ? petDobController.text : 'Not provided'}",
+                    style: normalTextStyle),
+                pw.Text(
+                    "Color: ${petColorController.text.isNotEmpty ? petColorController.text : 'Not provided'}",
+                    style: normalTextStyle),
+
+                pw.SizedBox(height: 10),
+
+                // Section: Medical History
+                pw.Text(" Medical History ", style: subHeaderStyle),
+                pw.Divider(color: PdfColors.grey),
+                pw.Text(
+                    "Previous Clinics: ${previousClinicsController.text.isNotEmpty ? previousClinicsController.text : 'Not provided'}",
+                    style: normalTextStyle),
+                pw.Text(
+                    "Current Medications: ${currentMedicationsController.text.isNotEmpty ? currentMedicationsController.text : 'Not provided'}",
+                    style: normalTextStyle),
+                pw.Text(
+                    "Allergies: ${allergiesController.text.isNotEmpty ? allergiesController.text : 'Not provided'}",
+                    style: normalTextStyle),
+
+                pw.SizedBox(height: 10),
+
+                // Section: Current Visit Information
+                pw.Text(" Current Visit Information ", style: subHeaderStyle),
+                pw.Divider(color: PdfColors.grey),
+                pw.Text(
+                    "Visit Date: ${visitDateController.text.isNotEmpty ? visitDateController.text : 'Not provided'}",
+                    style: normalTextStyle),
+                pw.Text(
+                    "Reason for Visit: ${reasonForVisitController.text.isNotEmpty ? reasonForVisitController.text : 'Not provided'}",
+                    style: normalTextStyle),
+                pw.Text(
+                    "Symptoms: ${symptomsController.text.isNotEmpty ? symptomsController.text : 'Not provided'}",
+                    style: normalTextStyle),
+
+                // Footer
+                pw.SizedBox(height: 20),
+                pw.Center(
+                  child: pw.Text(
+                    "Generated by Pet Clinic System",
+                    style: pw.TextStyle(fontSize: 10, color: PdfColors.grey),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+
+    // Show the print or download dialog
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+    );
   }
 }

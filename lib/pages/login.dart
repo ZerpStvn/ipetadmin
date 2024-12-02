@@ -37,9 +37,28 @@ class _GloballoginControllerState extends State<GloballoginController> {
     super.initState();
   }
 
-  void getuserdata(role) {
+  void getuserdata(int role) {
     if (role == 1) {
       Navigator.pushNamedAndRemoveUntil(context, '/vetuser', (route) => false);
+    } else if (role == 0) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Account Pending Verification'),
+            content: const Text(
+                'Your account is currently pending verification. Please wait for approval.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -225,7 +244,7 @@ class _GloballoginControllerState extends State<GloballoginController> {
         await authProvider
             .loginWithEmailAndPassword(email, password)
             .then((value) {
-          getuserdata(authProvider.userModel!.role);
+          getuserdata(authProvider.userModel!.isverified ?? 0);
           setState(() {
             isloggingin = false;
             debugPrint("${authProvider.userModel!.vetid}");
