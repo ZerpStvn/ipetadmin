@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gopetadmin/main.dart';
 import 'package:gopetadmin/misc/theme.dart';
 // import 'package:gopetadmin/controller/hooks.dart';
 // import 'package:gopetadmin/misc/randomstring.dart';
@@ -33,7 +34,7 @@ class _VeterinaryProfileState extends State<VeterinaryProfile> {
               if (!snapshot.hasData) {
                 return Container();
               } else {
-                Map<String, dynamic>? snaphotdata = snapshot.data!.data();
+                Map<String, dynamic>? snaphotdataclinic = snapshot.data!.data();
                 return Container(
                   height: 230,
                   width: MediaQuery.of(context).size.width,
@@ -51,7 +52,7 @@ class _VeterinaryProfileState extends State<VeterinaryProfile> {
                               image: DecorationImage(
                                   fit: BoxFit.cover,
                                   image: NetworkImage(
-                                      snaphotdata!['imageprofile']))),
+                                      snaphotdataclinic!['imageprofile']))),
                         ),
                         const SizedBox(
                           width: 20,
@@ -98,6 +99,54 @@ class _VeterinaryProfileState extends State<VeterinaryProfile> {
                                           style: const TextStyle(
                                               fontSize: 23,
                                               color: Colors.white),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor: checkclinic(
+                                                  snaphotdata['isclose'])),
+                                          onPressed: () {
+                                            snaphotdata['isclose'] == 0
+                                                ? updateClosedClinic(1)
+                                                : updateClosedClinic(0);
+                                          },
+                                          child: Text(
+                                            snaphotdata['isclose'] == 0
+                                                ? " Close Clinic"
+                                                : "Open Clinic",
+                                            style: TextStyle(
+                                                color:
+                                                    snaphotdata['isclose'] == 0
+                                                        ? maincolor
+                                                        : Colors.white),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  checkclinicdoctor(snaphotdata[
+                                                      'ishaveadoctor'])),
+                                          onPressed: () {
+                                            snaphotdata['ishaveadoctor'] == 0
+                                                ? updateCloseddoctor(1)
+                                                : updateCloseddoctor(0);
+                                          },
+                                          child: Text(
+                                              snaphotdata['ishaveadoctor'] == 0
+                                                  ? "Doctor Not Available"
+                                                  : "Doctor Available",
+                                              style: TextStyle(
+                                                  color: snaphotdata[
+                                                              'ishaveadoctor'] ==
+                                                          0
+                                                      ? maincolor
+                                                      : Colors.white)),
                                         ),
                                       ],
                                     )
@@ -209,5 +258,57 @@ class _VeterinaryProfileState extends State<VeterinaryProfile> {
         )
       ],
     );
+  }
+
+  Color checkclinic(
+    int isclose,
+  ) {
+    if (isclose == 1) {
+      return Colors.red;
+    } else {
+      return Colors.white;
+    }
+  }
+
+  Color checkclinicdoctor(int isdoctor) {
+    if (isdoctor == 1) {
+      return Colors.red;
+    } else {
+      return Colors.white;
+    }
+  }
+
+  Future<void> updateClosedClinic(int isclosed) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userauth.currentUser!.uid)
+          .collection('vertirenary')
+          .doc(userauth.currentUser!.uid)
+          .update({
+        "isclose": isclosed,
+      });
+      debugPrint("Updated");
+      setState(() {});
+    } catch (error) {
+      debugPrint("$error");
+    }
+  }
+
+  Future<void> updateCloseddoctor(int isdoctor) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userauth.currentUser!.uid)
+          .collection('vertirenary')
+          .doc(userauth.currentUser!.uid)
+          .update({
+        "ishaveadoctor": isdoctor,
+      });
+      debugPrint("Updated");
+      setState(() {});
+    } catch (error) {
+      debugPrint("$error");
+    }
   }
 }

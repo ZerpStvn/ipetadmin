@@ -19,7 +19,7 @@ class HomeScreenVeterinary extends StatefulWidget {
 }
 
 class _HomeScreenVeterinaryState extends State<HomeScreenVeterinary> {
-  int selectedIndex = 7;
+  int selectedIndex = 0;
 
   Widget navigator() {
     if (selectedIndex == 0) {
