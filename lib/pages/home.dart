@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gopetadmin/misc/theme.dart';
@@ -109,6 +110,22 @@ class _HomeScreenVeterinaryState extends State<HomeScreenVeterinary> {
                         ),
                         leading: const Icon(
                           Icons.square,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      ListTile(
+                        onTap: () {
+                          showModal();
+                        },
+                        title: const Text(
+                          "Notifications",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        leading: const Icon(
+                          Icons.notifications,
                           color: Colors.white,
                         ),
                       ),
@@ -249,5 +266,65 @@ class _HomeScreenVeterinaryState extends State<HomeScreenVeterinary> {
               builder: (context) => const GloballoginController()),
           (route) => false);
     });
+  }
+
+  void showModal() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text(
+              "Notifications",
+            ),
+            content: SizedBox(
+              width: 450,
+              height: 200,
+              child: FutureBuilder(
+                  future: FirebaseFirestore.instance
+                      .collection('announcement')
+                      .doc(userAuth.currentUser!.uid)
+                      .collection('announce')
+                      .get(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return Container();
+                    } else {
+                      return ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index) {
+                            Map<String, dynamic> snapdata =
+                                snapshot.data!.docs[index].data();
+                            return ListTile(
+                                leading: Icon(
+                                  Icons.notifications_active_outlined,
+                                  color: maincolor,
+                                ),
+                                subtitle: snapdata['valid'] == 1
+                                    ? const Text(" You are now a Verified user")
+                                    : const Text(
+                                        "The document you submitted is not a valid document email us your valid govermnet ID at petgo@gmail.com"),
+                                title: snapdata['valid'] == 1
+                                    ? const Text("Docuement IDs Approved",
+                                        style: TextStyle(
+                                          color: Colors.green,
+                                        ))
+                                    : const Text("Please Update your documents",
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                        )));
+                          });
+                    }
+                  }),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Close"))
+            ],
+          );
+        });
   }
 }

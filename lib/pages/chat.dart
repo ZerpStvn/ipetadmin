@@ -128,6 +128,7 @@ class _ChatPageState extends State<ChatPage> {
                                     .collection('chats')
                                     .doc(userAuth.currentUser!.uid)
                                     .collection('message')
+                                    .orderBy('timestamp', descending: true)
                                     .snapshots(),
                                 builder: (context, messageSnapshot) {
                                   if (messageSnapshot.connectionState ==
