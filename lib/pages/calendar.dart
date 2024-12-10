@@ -54,8 +54,7 @@ class _UserAppointmentcheckState extends State<UserAppointmentcheck> {
         DateTime dateOnly =
             DateTime(dateTime.year, dateTime.month, dateTime.day);
 
-        String formattedDate =
-            DateFormat('EEE, M/d/y, h:mm a').format(dateOnly);
+        String formattedDate = DateFormat('EEE, M/d/y').format(dateOnly);
         if (newEvents[dateOnly] == null) {
           newEvents[dateOnly] = [];
         }
@@ -147,6 +146,7 @@ class _UserAppointmentcheckState extends State<UserAppointmentcheck> {
                 itemBuilder: (context, index) {
                   final event = events[DateTime(_selectedDay!.year,
                       _selectedDay!.month, _selectedDay!.day)]![index];
+
                   return Card(
                     elevation: 29,
                     child: Column(

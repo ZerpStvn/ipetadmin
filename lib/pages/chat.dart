@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gopetadmin/controller/hooks.dart';
 
@@ -13,7 +14,7 @@ class _ChatPageState extends State<ChatPage> {
   Map<String, dynamic> getfetchuser = {};
   final TextEditingController _messageController = TextEditingController();
   String? chatID;
-
+  final currentuserid = FirebaseAuth.instance.currentUser!.uid;
   // Function to fetch user data by userId
   Future<void> getUser(String userId) async {
     try {
@@ -32,6 +33,13 @@ class _ChatPageState extends State<ChatPage> {
     } catch (e) {
       print('Error fetching user: $e');
     }
+  }
+
+  String sortid(String logedID, chatID) {
+    List<String> ids = [logedID, chatID];
+    ids.sort();
+    String chatDocId = ids.join("_");
+    return chatDocId;
   }
 
   @override
@@ -126,8 +134,9 @@ class _ChatPageState extends State<ChatPage> {
                               child: StreamBuilder<QuerySnapshot>(
                                 stream: FirebaseFirestore.instance
                                     .collection('chats')
-                                    .doc(userAuth.currentUser!.uid)
+                                    .doc(sortid(currentuserid, chatID))
                                     .collection('message')
+                                    .orderBy('timestamp', descending: true)
                                     .snapshots(),
                                 builder: (context, messageSnapshot) {
                                   if (messageSnapshot.connectionState ==
@@ -221,7 +230,7 @@ class _ChatPageState extends State<ChatPage> {
     try {
       DocumentReference chatDoc = FirebaseFirestore.instance
           .collection('chats')
-          .doc(userAuth.currentUser!.uid);
+          .doc(sortid(currentuserid, chatID));
 
       // Create or update the chat document
       await chatDoc.set({

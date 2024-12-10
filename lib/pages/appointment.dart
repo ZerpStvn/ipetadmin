@@ -38,6 +38,7 @@ class _AppointmentsState extends State<Appointments> {
           .collection('appointment')
           .doc(currentuser!.uid)
           .collection('vet')
+          .where("status", isEqualTo: 0)
           .get();
 
       if (query.docs.isNotEmpty) {
