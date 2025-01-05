@@ -98,6 +98,7 @@ class _VetControllerState extends State<VetController> {
       usersModel.email = emailaddress.text;
       usersModel.pass = password.text;
       usersModel.role = 1;
+      usersModel.isverified = 1;
       usersModel.vetid = userAuth.currentUser!.uid;
 
       await usercred

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gopetadmin/controller/fieldtags.dart';
@@ -37,6 +38,92 @@ class _VetCredsState extends State<VetCreds> {
   final VeterinaryModel veterinaryModel = VeterinaryModel();
   List<String> servicetags = [];
   List<String> specialtiesList = [];
+  List<Map<String, dynamic>> roomDetails = [];
+  List<String> dogTypes = [];
+
+  final List<String> hotelServices = [
+    "Grooming",
+    "Boarding",
+    "Daycare",
+    "Bathing",
+    "Training",
+    "Walking",
+    "Feeding",
+    "Playtime",
+  ];
+
+  final List<String> clinicServices = [
+    "Vaccination",
+    "Check-up",
+    "Surgery",
+    "Dental Cleaning",
+    "Diagnostics",
+    "X-ray",
+    "Blood Test",
+    "Medication",
+  ];
+
+  // Toggle switch state
+  bool isHotel = true; // True for Hotel, False for Clinic
+
+  // Selected services
+  List<bool> isSelected = [];
+  Map<String, List<double>> servicePrices =
+      {}; // Stores prices for each service
+
+  // Initialize toggle buttons selection
+  void _initializeSelection() {
+    isSelected = List.generate(
+        isHotel ? hotelServices.length : clinicServices.length, (_) => false);
+  }
+
+  // Function to add prices for a service
+  void addPrice(String service, double price) {
+    setState(() {
+      if (!servicePrices.containsKey(service)) {
+        servicePrices[service] = [];
+      }
+      servicePrices[service]!.add(price);
+    });
+  }
+
+  // Function to save data to Firestore
+  Future<void> saveToFirestore() async {
+    try {
+      final data = {
+        'type': isHotel ? 'Hotel' : 'Clinic',
+        'dogTypes': isHotel ? dogTypes : [],
+        'roomDetails': isHotel ? roomDetails : [],
+        'timestamp': Timestamp.now(),
+      };
+
+      await FirebaseFirestore.instance
+          .collection('pet_services')
+          .doc(widget.documentID)
+          .set(data, SetOptions(merge: true));
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Data saved successfully!")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error saving data: $e")),
+      );
+    }
+  }
+
+  Future<void> addDogType(String type) async {
+    setState(() {
+      dogTypes.add(type);
+    });
+  }
+
+  Future<void> addRoomDetails(String size, int capacity) async {
+    setState(() {
+      roomDetails.add({'size': size, 'capacity': capacity});
+    });
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -46,6 +133,7 @@ class _VetCredsState extends State<VetCreds> {
 
   @override
   void initState() {
+    _initializeSelection();
     super.initState();
     stringController = StringTagController();
     specialties = StringTagController();
@@ -73,6 +161,7 @@ class _VetCredsState extends State<VetCreds> {
         veterinaryModel.specialties = specialtiesList;
         veterinaryModel.description = description.text;
         veterinaryModel.dateestablished = dateEstablished.text;
+        await saveToFirestore();
         await usercred
             .doc(widget.documentID)
             .collection('vertirenary')
@@ -101,6 +190,7 @@ class _VetCredsState extends State<VetCreds> {
 
   @override
   Widget build(BuildContext context) {
+    final currentServices = isHotel ? hotelServices : clinicServices;
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -200,8 +290,209 @@ class _VetCredsState extends State<VetCreds> {
                     const SizedBox(
                       height: 18,
                     ),
+                    const SizedBox(height: 20),
+                    if (isHotel)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Dog Types Accepted",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Wrap(
+                            spacing: 8.0,
+                            children: dogTypes
+                                .map((type) => Chip(
+                                      label: Text(type),
+                                      onDeleted: () {
+                                        setState(() {
+                                          dogTypes.remove(type);
+                                        });
+                                      },
+                                    ))
+                                .toList(),
+                          ),
+                          const SizedBox(height: 20),
+                          TextField(
+                            decoration: const InputDecoration(
+                              labelText: "Add Dog Type",
+                              border: OutlineInputBorder(),
+                            ),
+                            onSubmitted: (value) {
+                              if (value.isNotEmpty) addDogType(value);
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          const Text(
+                            "Room Details",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 20),
+                          ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: roomDetails.length,
+                            itemBuilder: (context, index) {
+                              final room = roomDetails[index];
+                              return ListTile(
+                                title: Text("Room Size: ${room['size']}"),
+                                subtitle:
+                                    Text("Capacity: ${room['capacity']} dogs"),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete),
+                                  onPressed: () {
+                                    setState(() {
+                                      roomDetails.removeAt(index);
+                                    });
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              final sizeController = TextEditingController();
+                              final capacityController =
+                                  TextEditingController();
+
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text("Add Room Details"),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        TextField(
+                                          controller: sizeController,
+                                          decoration: const InputDecoration(
+                                            labelText: "Room Size",
+                                          ),
+                                        ),
+                                        TextField(
+                                          controller: capacityController,
+                                          decoration: const InputDecoration(
+                                            labelText: "Capacity",
+                                          ),
+                                          keyboardType: TextInputType.number,
+                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text("Cancel"),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          final size = sizeController.text;
+                                          final capacity = int.tryParse(
+                                              capacityController.text);
+                                          if (size.isNotEmpty &&
+                                              capacity != null) {
+                                            addRoomDetails(size, capacity);
+                                            Navigator.pop(context);
+                                          }
+                                        },
+                                        child: const Text("Add"),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            child: const Text("Add Room"),
+                          ),
+                        ],
+                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text("Clinic"),
+                        Switch(
+                          value: isHotel,
+                          onChanged: (value) {
+                            setState(() {
+                              isHotel = value;
+                              _initializeSelection(); // Reinitialize selection for new services
+                            });
+                          },
+                        ),
+                        const Text("Hotel"),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    const Text("Add Price Rate"),
+                    Wrap(
+                      spacing: 8.0, // Horizontal spacing between children
+                      runSpacing: 4.0, // Vertical spacing between rows
+                      children: [
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.90,
+                          child: ToggleButtons(
+                            isSelected: isSelected,
+                            onPressed: (index) {
+                              setState(() {
+                                isSelected[index] = !isSelected[index];
+                              });
+                            },
+                            children: currentServices
+                                .map((service) => Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0),
+                                      child: Text(service),
+                                    ))
+                                .toList(),
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(
                       height: 5,
+                    ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: currentServices.length,
+                      itemBuilder: (context, index) {
+                        final service = currentServices[index];
+                        return isSelected[index]
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "$service Prices:",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  if (servicePrices.containsKey(service))
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: servicePrices[service]!
+                                          .map((price) => Text(
+                                              "\$${price.toStringAsFixed(2)}"))
+                                          .toList(),
+                                    ),
+                                  TextField(
+                                    decoration: InputDecoration(
+                                      labelText: "Add Price for $service",
+                                    ),
+                                    keyboardType: TextInputType.number,
+                                    onSubmitted: (value) {
+                                      final price = double.tryParse(value);
+                                      if (price != null) {
+                                        addPrice(service, price);
+                                      }
+                                    },
+                                  ),
+                                ],
+                              )
+                            : SizedBox.shrink();
+                      },
+                    ),
+                    const SizedBox(
+                      height: 18,
                     ),
                     Textformtype(
                         fieldname: "Clinic Description",
@@ -211,7 +502,7 @@ class _VetCredsState extends State<VetCreds> {
                     const SizedBox(
                       height: 25,
                     ),
-                    const Text("Service Offer"),
+                    const Text("Service Offer (tags)"),
                     ClinicFieldTags(
                         stringController: stringController,
                         distanceToField: _distanceToField,

@@ -12,6 +12,8 @@ class VeterinaryModel {
   String? clinicname;
   String? imageprofile;
   String? dateestablished;
+  int? ishaveadoctor;
+  int? isclose;
 
   VeterinaryModel(
       {this.valid,
@@ -26,6 +28,8 @@ class VeterinaryModel {
       this.lat,
       this.long,
       this.clinicname,
+      this.ishaveadoctor,
+      this.isclose,
       this.dateestablished});
 
   factory VeterinaryModel.getdocument(map) {
@@ -34,6 +38,7 @@ class VeterinaryModel {
       tin: map['tin'],
       dti: map['dti'],
       bir: map['bir'],
+      ishaveadoctor: map['ishaveadoctor'],
       imageprofile: map['imageprofile'],
       clinicname: map['clinicname'],
       operation: map['operation'],
@@ -41,6 +46,7 @@ class VeterinaryModel {
       specialties: map['specialties'],
       description: map['description'],
       lat: map['lat'],
+      isclose: map['isclose'],
       long: map['long'],
       dateestablished: map['dateestablished'],
     );
@@ -53,6 +59,8 @@ class VeterinaryModel {
       "clinicname": clinicname,
       "dti": dti,
       "bir": bir,
+      "ishaveadoctor": 1,
+      "isclose": 0,
       "imageprofile": imageprofile,
       "operation": operation,
       "services": services,

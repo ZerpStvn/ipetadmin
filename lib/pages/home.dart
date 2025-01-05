@@ -4,6 +4,7 @@ import 'package:gopetadmin/misc/theme.dart';
 import 'package:gopetadmin/pages/Feedbacks.dart';
 import 'package:gopetadmin/pages/addrecord.dart';
 import 'package:gopetadmin/pages/appointment.dart';
+import 'package:gopetadmin/pages/booking.dart';
 import 'package:gopetadmin/pages/calendar.dart';
 import 'package:gopetadmin/pages/chat.dart';
 import 'package:gopetadmin/pages/login.dart';
@@ -43,6 +44,8 @@ class _HomeScreenVeterinaryState extends State<HomeScreenVeterinary> {
       return const ChatPage();
     } else if (selectedIndex == 7) {
       return const Uploadrecords();
+    } else if (selectedIndex == 8) {
+      return const BookingPage();
     } else {
       return Container();
     }
@@ -90,6 +93,24 @@ class _HomeScreenVeterinaryState extends State<HomeScreenVeterinary> {
                         },
                         title: const Text(
                           "Appointments",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        leading: const Icon(
+                          Icons.list_alt_outlined,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      ListTile(
+                        onTap: () {
+                          setState(() {
+                            selectedIndex = 8;
+                          });
+                        },
+                        title: const Text(
+                          "Booking",
                           style: TextStyle(color: Colors.white),
                         ),
                         leading: const Icon(

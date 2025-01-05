@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gopetadmin/controller/hooks.dart';
+import 'package:intl/intl.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -182,7 +183,22 @@ class _ChatPageState extends State<ChatPage> {
                                           child: messageData['imageUrl'] != null
                                               ? Image.network(
                                                   messageData['imageUrl'])
-                                              : Text(messageData['text'] ?? ''),
+                                              : Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(messageData['text'] ??
+                                                        ''),
+                                                    Text(
+                                                      formatTimestamp(
+                                                          messageData[
+                                                              'timestamp']),
+                                                      style: const TextStyle(
+                                                          fontSize: 10.0,
+                                                          color: Colors.white),
+                                                    ),
+                                                  ],
+                                                ),
                                         ),
                                       );
                                     },
@@ -224,6 +240,37 @@ class _ChatPageState extends State<ChatPage> {
         ),
       ],
     );
+  }
+
+  String formatTimestamp(dynamic timestamp) {
+    if (timestamp == null) return 'Unknown'; // Handle null timestamp
+
+    // Convert Timestamp to DateTime if needed
+    DateTime dateTime;
+    if (timestamp is Timestamp) {
+      dateTime = timestamp.toDate();
+    } else if (timestamp is DateTime) {
+      dateTime = timestamp;
+    } else {
+      throw ArgumentError('Invalid timestamp type');
+    }
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final sentDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
+
+    if (sentDate == today) {
+      // Sent today
+      return DateFormat('h:mm a').format(dateTime); // Format as 3:00 AM
+    } else if (now.difference(dateTime).inHours < 24) {
+      // Sent within the last 24 hours
+      return DateFormat('MMM. d h:mm a')
+          .format(dateTime); // Format as Apr. 20 3:00 AM
+    } else {
+      // Sent more than 24 hours ago
+      return DateFormat('MMM. d, yyyy h:mm a')
+          .format(dateTime); // Format as Apr. 20, 2023 3:00 AM
+    }
   }
 
   Future<void> _sendMessage() async {
